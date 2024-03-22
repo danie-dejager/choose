@@ -2,7 +2,6 @@ Name:           choose
 Version:        1.3.4
 Release:        1%{?dist}
 Summary:        A human-friendly and fast alternative to cut and (sometimes) awk
-BuildRequires:  upx
 
 License:        MIT
 URL:            https://github.com/theryangeary/choose
