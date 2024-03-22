@@ -6,7 +6,7 @@ BuildRequires:  upx
 
 License:        MIT
 URL:            https://github.com/theryangeary/choose
-Source0:        https://github.com/theryangeary/choose/archive/refs/tags/%{version}.tar.gz
+Source0:        https://github.com/theryangeary/choose/archive/refs/tags/v%{version}.tar.gz
 
 %description
 A longer description of your package
