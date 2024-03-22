@@ -8,6 +8,9 @@ License:        MIT
 URL:            https://github.com/theryangeary/choose
 Source0:        https://github.com/theryangeary/choose/archive/refs/tags/v%{version}.tar.gz
 
+BuildRequires:  rust
+BuildRequires:  cargo
+
 %description
 A longer description of your package
 
