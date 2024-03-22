@@ -27,3 +27,6 @@ install -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 %files
 %defattr(-,root,root,-)
 %{_bindir}/%{name}
+
+%changelog
+* Fri Mar 21 2024 Danie de Jager - 1.3.4-1
