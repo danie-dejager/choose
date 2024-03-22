@@ -32,4 +32,4 @@ install -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
-* Fri Mar 21 2024 Danie de Jager - 1.3.4-1
+* Fri Mar 22 2024 Danie de Jager - 1.3.4-1
