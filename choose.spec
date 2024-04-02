@@ -9,6 +9,7 @@ Source0:        https://github.com/theryangeary/choose/archive/refs/tags/v%{vers
 
 BuildRequires:  rust
 BuildRequires:  cargo
+BuildRequires:  upx
 
 %description
 A longer description of your package
