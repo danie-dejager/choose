@@ -1,6 +1,6 @@
 Name:           choose
-Version:        1.3.4
-Release:        5%{?dist}
+Version:        1.3.5
+Release:        1%{?dist}
 Summary:        A human-friendly and fast alternative to cut and (sometimes) awk
 
 License:        MIT
@@ -32,6 +32,7 @@ install -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Tue Oct 1 2024 - Danie de Jager - 1.3.4-5
 * Fri Sep 13 2024 - Danie de Jager - 1.3.4-5
 * Tue May 21 2024 - Danie de Jager - 1.3.4-4
 * Fri Apr 26 2024 - Danie de Jager - 1.3.4-3
