@@ -27,7 +27,6 @@ curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export PATH="$PATH:$HOME/.cargo/bin"
 cargo build --release
 strip --strip-all target/release/%{name}
-upx target/release/%{name}
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
