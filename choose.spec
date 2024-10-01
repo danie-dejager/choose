@@ -20,7 +20,12 @@ A longer description of your package
 %setup -q
 
 %build
-cargo build --release 
+%ifarch aarch64
+rustup target add aarch64-unknown-linux-gnu
+cargo build --release --target aarch64-unknown-linux-gnu
+%else
+cargo build --release
+%endif
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
