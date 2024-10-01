@@ -7,8 +7,10 @@ License:        MIT
 URL:            https://github.com/theryangeary/choose
 Source0:        https://github.com/theryangeary/choose/archive/refs/tags/v%{version}.tar.gz
 
-BuildRequires:  rust
-BuildRequires:  cargo
+BuildRequires:  curl
+BuildRequires:  gcc
+BuildRequires:  make
+BuildRequires:  gzip
 BuildRequires:  upx
 
 %description
@@ -20,12 +22,12 @@ A longer description of your package
 %setup -q
 
 %build
-%ifarch aarch64
-rustup target add aarch64-unknown-linux-gnu
-cargo build --release --target aarch64-unknown-linux-gnu
-%else
+# Install Rust using curl
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+export PATH="$PATH:$HOME/.cargo/bin"
 cargo build --release
-%endif
+strip --strip-all target/release/%{name}
+upx target/release/%{name}
 
 %install
 mkdir -p %{buildroot}/%{_bindir}
