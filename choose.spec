@@ -1,5 +1,5 @@
 Name:           choose
-Version:        1.3.5
+Version:        1.3.6
 Release:        1%{?dist}
 Summary:        A human-friendly and fast alternative to cut and (sometimes) awk
 
@@ -41,6 +41,8 @@ install -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Wed Oct 2 2024 - Danie de Jager - 1.3.6-1
+- removed cross-compilation patch as no longer needed.
 * Tue Oct 1 2024 - Danie de Jager - 1.3.5-1
 - Remove cross-compilation lines from config.toml
 * Fri Sep 13 2024 - Danie de Jager - 1.3.4-5
