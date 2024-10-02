@@ -34,7 +34,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get install -y gcc-aarch64-linux-gnu
         rustup target add aarch64-unknown-linux-gnu
-        cargo build --verbose --release --target aarch64-unknown-linux-gnu
+        cargo build --verbose --release --target aarch64-unknown-linux-gnu --config target.aarch64-unknown-linux-gnu.linker=\"aarch64-linux-gnu-gcc\"
 
     - name: Build aarch64-apple-darwin
       run: |
@@ -114,7 +114,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: target/x86_64-pc-windows-gnu/release/choose
+        asset_path: target/x86_64-pc-windows-gnu/release/choose.exe
         asset_name: choose-x86_64-pc-windows-gnu
         asset_content_type: application/raw
 
