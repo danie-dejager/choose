@@ -22,9 +22,6 @@ A longer description of your package
 %setup -q
 
 %build
-# Remove cross-compilation lines from config.toml
-sed -i '/\[target\.aarch64-unknown-linux-gnu\]/,+1d' .cargo/config.toml
-
 # Install Rust using curl
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 export PATH="$PATH:$HOME/.cargo/bin"
