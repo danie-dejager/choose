@@ -1,6 +1,6 @@
 Name:           choose
 Version:        1.3.6
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A human-friendly and fast alternative to cut and (sometimes) awk
 
 License:        MIT
@@ -38,6 +38,7 @@ install -m 755 target/release/%{name} %{buildroot}/%{_bindir}/%{name}
 %{_bindir}/%{name}
 
 %changelog
+* Thu Feb 6 2025 - Danie de Jager - 1.3.6-3
 * Fri Dec 20 2024 - Danie de Jager - 1.3.6-2
 * Wed Oct 2 2024 - Danie de Jager - 1.3.6-1
 - removed cross-compilation patch as no longer needed.
