@@ -1,17 +1,14 @@
+use crate::{process_all_choices_for_line, writer::Writer};
+
 use super::*;
 
 fn test_fn(vec: Vec<&str>, input: &str, output: &str) {
     let config = Config::from_iter(vec);
-    let mut handle = BufWriter::new(MockStdout::new());
+    let mut handle = Writer::from(BufWriter::new(MockStdout::new()));
 
-    config.opt.choices[0]
-        .print_choice(&String::from(input), &config, &mut handle)
-        .unwrap();
+    process_all_choices_for_line(&mut handle, &config, input).unwrap();
 
-    assert_eq!(
-        String::from(output),
-        MockStdout::str_from_buf_writer(handle)
-    );
+    assert_eq!(String::from(output), MockStdout::str_from_writer(handle));
 }
 
 #[test]
@@ -27,23 +24,20 @@ fn print_after_end() {
 #[test]
 fn print_out_of_order() {
     let config = Config::from_iter(vec!["choose", "3", "1"]);
-    let mut handle = BufWriter::new(MockStdout::new());
-    let mut handle1 = BufWriter::new(MockStdout::new());
+    let mut handle = Writer::from(BufWriter::new(MockStdout::new()));
+    let mut handle1 = Writer::from(BufWriter::new(MockStdout::new()));
 
     config.opt.choices[0]
         .print_choice(&String::from("rust is pretty cool"), &config, &mut handle)
         .unwrap();
 
-    assert_eq!(
-        String::from("cool"),
-        MockStdout::str_from_buf_writer(handle)
-    );
+    assert_eq!(String::from("cool"), MockStdout::str_from_writer(handle));
 
     config.opt.choices[1]
         .print_choice(&String::from("rust is pretty cool"), &config, &mut handle1)
         .unwrap();
 
-    assert_eq!(String::from("is"), MockStdout::str_from_buf_writer(handle1));
+    assert_eq!(String::from("is"), MockStdout::str_from_writer(handle1));
 }
 
 #[test]
@@ -245,7 +239,7 @@ fn print_1_to_3_with_output_field_separator() {
 
 #[test]
 fn print_1_and_3_with_output_field_separator() {
-    test_fn(vec!["choose", "1", "3", "-o", "#"], "a b c d", "b");
+    test_fn(vec!["choose", "1", "3", "-o", "#"], "a b c d", "b#d");
 }
 
 #[test]
@@ -513,16 +507,16 @@ fn print_1_to_3_with_output_field_separator_rust_syntax_inclusive() {
 
 #[test]
 fn print_1_and_3_with_output_field_separator_rust_syntax_inclusive() {
-    let config = Config::from_iter(vec!["choose", "1", "3", "-o", "#"]);
-    let mut handle = BufWriter::new(MockStdout::new());
-    config.opt.choices[0]
-        .print_choice(&String::from("a b c d"), &config, &mut handle)
-        .unwrap();
-    handle.write(&config.output_separator).unwrap();
-    config.opt.choices[1]
-        .print_choice(&String::from("a b c d"), &config, &mut handle)
-        .unwrap();
-    assert_eq!(String::from("b#d"), MockStdout::str_from_buf_writer(handle));
+    test_fn(vec!["choose", "1", "3", "-o", "#"], "a b c d", "b#d");
+}
+
+#[test]
+fn print_1_and_3_with_percent_output_field_separator_should_have_one_percent_sign() {
+    test_fn(
+        vec!["choose", "1", "3", "-o", "%"],
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor",
+        "ipsum%sit",
+    );
 }
 
 #[test]
@@ -1029,4 +1023,9 @@ fn print_after_end_to_last_negative_is_empty() {
 #[test]
 fn print_after_end_to_second_to_last_negative_is_empty() {
     test_fn(vec!["choose", "5:-2"], "a b c d e", "");
+}
+
+#[test]
+fn do_not_print_carriage_return() {
+    test_fn(vec!["choose", ":"], "ABC;GHI;JKKK;KLLL\r  ", "ABC;GHI;JKKK;KLLL");
 }

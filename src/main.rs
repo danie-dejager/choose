@@ -1,5 +1,5 @@
 use std::fs::File;
-use std::io::{self, Read};
+use std::io::{self, BufRead, Read};
 use std::process;
 use structopt::StructOpt;
 
@@ -9,11 +9,9 @@ extern crate lazy_static;
 mod choice;
 mod config;
 mod error;
-mod escape;
 mod opt;
 mod parse;
 mod parse_error;
-mod reader;
 mod result;
 mod writeable;
 mod writer;
@@ -24,14 +22,20 @@ use opt::Opt;
 use result::Result;
 use writer::WriteReceiver;
 
+use crate::writer::Writer;
+
 fn main() {
     let opt = Opt::from_args();
 
     let stdout = io::stdout();
     let lock = stdout.lock();
     let exit_result = match opt.input {
-        Some(_) => main_generic(opt, &mut io::BufWriter::new(lock)),
-        None => main_generic(opt, &mut io::LineWriter::new(lock)),
+        Some(_) => main_generic(opt, Writer::from(io::BufWriter::new(lock))),
+        // it is important to use a LineWriter instead of BufWriter so that if
+        // the user is sitting waiting for output for a pipeline that gives lines
+        // slowly, they won't have to wait for the buffer to fill up before they
+        // see anything (think `tail`ing logs)
+        None => main_generic(opt, Writer::from(io::LineWriter::new(lock))),
     };
 
     match exit_result {
@@ -52,7 +56,7 @@ fn main() {
     }
 }
 
-fn main_generic<W: WriteReceiver>(opt: Opt, handle: &mut W) -> Result<()> {
+fn main_generic<W: WriteReceiver>(opt: Opt, mut handle: Writer<W>) -> Result<()> {
     let config = Config::new(opt);
 
     let read = match &config.opt.input {
@@ -67,29 +71,42 @@ fn main_generic<W: WriteReceiver>(opt: Opt, handle: &mut W) -> Result<()> {
         None => Box::new(io::stdin()) as Box<dyn Read>,
     };
 
-    let mut reader = reader::BufReader::new(read);
+    let mut reader = io::BufReader::new(read);
     let mut buffer = String::new();
 
-    while let Some(line) = reader.read_line(&mut buffer) {
-        match line {
-            Ok(l) => {
-                // trim end to remove newline or CRLF on windows
-                let l = l.trim_end();
+    loop {
+        buffer.clear();
+        match reader.read_line(&mut buffer) {
+            Ok(n) => {
+                if n == 0 {
+                    // EOF
+                    break;
+                }
 
-                let choice_iter = &mut config.opt.choices.iter().peekable();
-
-                while let Some(choice) = choice_iter.next() {
-                    choice.print_choice(l, &config, handle)?;
-                    if choice_iter.peek().is_some() {
-                        handle.write_separator(&config)?;
+                if buffer.ends_with('\n') {
+                    buffer.pop();
+                    if buffer.ends_with('\r') {
+                        buffer.pop();
                     }
                 }
 
-                handle.write(b"\n").map(|_| ())?
+                process_all_choices_for_line(&mut handle, &config, &buffer)?;
+
+                handle.write_line()?;
             }
             Err(e) => println!("Failed to read line: {}", e),
         }
     }
 
     Ok(())
+}
+
+fn process_all_choices_for_line<W: WriteReceiver>(
+    handle: &mut Writer<W>,
+    config: &Config,
+    line: &str,
+) -> Result<()> {
+    Ok(for choice in &config.opt.choices {
+        choice.print_choice(line, config, handle)?;
+    })
 }
