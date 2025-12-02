@@ -17,6 +17,7 @@ BuildRequires:  upx
 A longer description of your package
 
 %global debug_package %{nil}
+%undefine _package_note_file
 
 %prep
 %setup -q
